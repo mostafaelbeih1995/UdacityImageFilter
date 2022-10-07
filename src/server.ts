@@ -1,6 +1,7 @@
-import express from 'express';
 import bodyParser from 'body-parser';
+import fs from "fs";
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import express, { Router, Request, Response } from 'express';
 
 (async () => {
 
@@ -28,6 +29,23 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
+
+  app.get("/filteredimage", async (req : Request, res : Response) => {
+
+    const { image_url } = req.query
+
+    if(!image_url) {
+      res.status(422).send("Missing query Parameter (image_url)");  
+    }
+
+    const filteredpath = await filterImageFromURL(image_url);
+
+    res.sendFile(filteredpath, () => {
+      deleteLocalFiles([filteredpath]);
+    });
+    
+
+  });
 
   //! END @TODO1
   
